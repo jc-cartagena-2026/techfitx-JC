@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - TechFix J.C.</title>
+<style>body{font-family:Arial;background:#f4f6f9;padding:20px} .box{background:#fff;padding:20px;border-radius:12px;max-width:900px;margin:auto;box-shadow:0 2px 10px #0001} input,textarea{width:100%;padding:8px;margin:5px 0;border:1px solid #ccc;border-radius:6px} .btn{background:#0d1b2a;color:#fff;padding:10px 15px;border:none;border-radius:6px;cursor:pointer;margin:5px} table{width:100%;border-collapse:collapse;margin-top:15px} th,td{border:1px solid #ddd;padding:8px;text-align:left} th{background:#0d1b2a;color:#fff}</style>
+</head>
+<body>
+<div class="box" id="loginBox">
+<h2>Admin TechFix J.C.</h2>
+<p>Usuario: admin / Clave: admin123</p>
+<input id="user" placeholder="Usuario"><input id="pass" type="password" placeholder="Contraseña">
+<button class="btn" onclick="login()">Entrar</button><p id="error" style="color:red"></p>
+</div>
+
+<div class="box" id="adminBox" style="display:none">
+<h2>Panel Admin J.C. <button class="btn" onclick="logout()" style="float:right;background:red">Salir</button></h2>
+<h3>Gestión de Servicios (Frontend + Datos)</h3>
+<input id="sNombre" placeholder="Nombre servicio"><input id="sPrecio" placeholder="Precio"><textarea id="sDesc" placeholder="Descripción"></textarea>
+<button class="btn" onclick="agregarServicio()">Agregar Servicio</button>
+<table id="tablaServicios"><tr><th>ID</th><th>Nombre</th><th>Precio</th><th>Acción</th></tr></table>
+
+<h3 style="margin-top:30px">Contactos Recibidos (Contacto Real - localStorage)</h3>
+<table id="tablaContactos"><tr><th>Fecha</th><th>Nombre</th><th>Servicio</th><th>Mensaje</th></tr></table>
+<br><a href="index.html" class="btn">Volver a la página principal</a>
+</div>
+
+<script>
+function login(){if(document.getElementById('user').value==='admin' && document.getElementById('pass').value==='admin123'){document.getElementById('loginBox').style.display='none';document.getElementById('adminBox').style.display='block';cargarAdmin();}else{document.getElementById('error').innerText='Usuario o clave incorrectos';}}
+function logout(){document.getElementById('adminBox').style.display='none';document.getElementById('loginBox').style.display='block';}
+let servicios = JSON.parse(localStorage.getItem('techfix_services_jc')) || [
+{id:1,nombre:"Mantenimiento Preventivo PC",precio:"$80.000",desc:"Limpieza interna"},
+{id:2,nombre:"Formateo e Instalación Windows",precio:"$60.000",desc:"Windows + Office"},
+{id:3,nombre:"Reparación de Portátiles",precio:"$120.000",desc:"Pantalla y teclado"},
+{id:4,nombre:"Instalación de Redes WiFi",precio:"$100.000",desc:"Router y cableado"},
+{id:5,nombre:"Recuperación de Datos",precio:"$150.000",desc:"Discos y USB"},
+{id:6,nombre:"Venta de Accesorios",precio:"Desde $20.000",desc:"Mouse y teclados"}
+];
+function cargarAdmin(){
+let html=""; servicios.forEach((s,i)=>{html+=`<tr><td>${s.id}</td><td>${s.nombre}</td><td>${s.precio}</td><td><button onclick="eliminar(${i})" style="background:red;color:#fff;border:none;padding:5px;border-radius:4px">Borrar</button></td></tr>`});
+document.getElementById('tablaServicios').innerHTML="<tr><th>ID</th><th>Nombre</th><th>Precio</th><th>Acción</th></tr>"+html;
+let contactos=JSON.parse(localStorage.getItem('techfix_contacts_jc'))||[];
+let html2=""; contactos.forEach(c=>{html2+=`<tr><td>${c.fecha}</td><td>${c.nombre}<br>${c.email}</td><td>${c.servicio}</td><td>${c.mensaje}</td></tr>`});
+document.getElementById('tablaContactos').innerHTML="<tr><th>Fecha</th><th>Nombre</th><th>Servicio</th><th>Mensaje</th></tr>"+html2;
+localStorage.setItem('techfix_services_jc',JSON.stringify(servicios));
+}
+function agregarServicio(){
+let n=document.getElementById('sNombre').value;let p=document.getElementById('sPrecio').value;let d=document.getElementById('sDesc').value;
+if(!n) return alert("Pon nombre");
+servicios.push({id:Date.now(),nombre:n,precio:p,desc:d});
+document.getElementById('sNombre').value="";document.getElementById('sPrecio').value="";document.getElementById('sDesc').value="";
+cargarAdmin();
+}
+function eliminar(i){servicios.splice(i,1);cargarAdmin();}
+</script>
+</body>
+</html>
